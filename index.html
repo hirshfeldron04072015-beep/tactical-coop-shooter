@@ -3,61 +3,184 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Last Line - Tactical Coop Shooter</title>
+  <title>Last Line - 3D Tactical Shooter</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #0b0d13;
-      color: #edf2ff;
+      background: #000;
       font-family: Arial, sans-serif;
     }
-    body {
+    body { display: flex; align-items: center; justify-content: center; }
+    #gameContainer {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+    #hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      font-size: 14px;
+      color: #0f0;
+      font-family: monospace;
+      text-shadow: 0 0 5px #0f0;
+    }
+    #crosshair {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid #0f0;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    #crosshair::before {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #0f0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+    }
+    #healthBar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 200px;
+      height: 20px;
+      background: #1a1a1a;
+      border: 2px solid #0f0;
+      overflow: hidden;
+    }
+    #healthFill {
+      height: 100%;
+      background: #0f0;
+      width: 100%;
+      transition: width 0.1s;
+    }
+    #ammoDisplay {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border: 2px solid #0f0;
+      color: #0f0;
+      font-family: monospace;
+    }
+    #radar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 150px;
+      height: 150px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #0f0;
+    }
+    #menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
+      z-index: 100;
+      color: #0f0;
+      font-family: monospace;
     }
-    #gameContainer {
-      width: 1280px;
-      height: 720px;
-      background: #111827;
-      border: 2px solid #2e3c52;
-      box-shadow: 0 0 25px rgba(110, 168, 255, 0.2);
-      position: relative;
+    #menu h1 {
+      font-size: 64px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 20px #0f0;
     }
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      background: #121821;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
+    #menu p {
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
-    @media (max-width: 1400px) {
-      #gameContainer { max-width: 100vw; max-height: 100vh; }
+    #menu p:hover {
+      text-shadow: 0 0 10px #0f0;
+      transform: scale(1.1);
     }
+    #gameOver {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      padding: 40px;
+      border: 3px solid #f00;
+      text-align: center;
+      display: none;
+      z-index: 200;
+      color: #0f0;
+      font-family: monospace;
+      min-width: 400px;
+    }
+    #gameOver h2 { color: #f00; font-size: 48px; margin-bottom: 20px; }
+    #gameOver p { margin: 10px 0; font-size: 16px; }
   </style>
 </head>
 <body>
   <div id="gameContainer">
-    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    <canvas id="gameCanvas"></canvas>
+    <div id="hud">
+      <div id="healthBar">
+        <div id="healthFill"></div>
+      </div>
+      <div id="crosshair"></div>
+      <div id="ammoDisplay">
+        <div>Ammo: <span id="ammoCount">30</span></div>
+        <div>Mag: <span id="magCount">5</span></div>
+        <div id="weaponName" style="margin-top: 10px;">Pulse Rifle</div>
+      </div>
+      <canvas id="radarCanvas" width="150" height="150" style="position: absolute; bottom: 20px; left: 20px; border: 2px solid #0f0;"></canvas>
+    </div>
+    <div id="menu">
+      <h1>LAST LINE</h1>
+      <p style="margin-top: 30px;">3D Tactical Shooter</p>
+      <p style="margin-top: 50px; font-size: 16px;">Press SPACE to Start</p>
+      <p style="font-size: 14px; margin-top: 30px;">
+        WASD: Move | Mouse: Look | LClick: Shoot | Shift: Sprint<br>
+        F: Melee | Q: Ability | R: Reload | ESC: Menu
+      </p>
+    </div>
+    <div id="gameOver">
+      <h2>MISSION FAILED</h2>
+      <p id="finalStats"></p>
+      <p style="margin-top: 20px; cursor: pointer;" onclick="location.reload()">Press R to Restart</p>
+    </div>
   </div>
-  <script src="src/config.js"></script>
-  <script src="src/math.js"></script>
-  <script src="src/input.js"></script>
-  <script src="src/draw.js"></script>
-  <script src="src/entity.js"></script>
-  <script src="src/player.js"></script>
-  <script src="src/enemy.js"></script>
-  <script src="src/projectile.js"></script>
-  <script src="src/pickup.js"></script>
-  <script src="src/particle.js"></script>
-  <script src="src/weapon.js"></script>
-  <script src="src/mission.js"></script>
-  <script src="src/ui.js"></script>
-  <script src="src/game.js"></script>
-  <script src="src/main.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="src/3d/config.js"></script>
+  <script src="src/3d/math.js"></script>
+  <script src="src/3d/input.js"></script>
+  <script src="src/3d/camera.js"></script>
+  <script src="src/3d/player.js"></script>
+  <script src="src/3d/enemy.js"></script>
+  <script src="src/3d/weapon.js"></script>
+  <script src="src/3d/effects.js"></script>
+  <script src="src/3d/ui.js"></script>
+  <script src="src/3d/game.js"></script>
+  <script src="src/3d/main.js"></script>
 </body>
 </html>
