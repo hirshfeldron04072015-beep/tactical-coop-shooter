@@ -1,12 +1,27 @@
 window.addEventListener('DOMContentLoaded', () => {
   window.LastLine.Input.init();
+  window.gameStarted = false;
   const game = new window.LastLine.Game();
-  const startBtn = document.getElementById('menu');
+  const playBtn = document.getElementById('playBtn');
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      window.gameStarted = true;
+      game.startGame();
+    });
+    playBtn.addEventListener('touch', () => {
+      window.gameStarted = true;
+      game.startGame();
+    });
+  }
   document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !game.gameRunning) {
+    if (e.code === 'Space' && !window.gameStarted) {
+      e.preventDefault();
+      window.gameStarted = true;
       game.startGame();
     }
-    if (e.code === 'Escape' && game.gameRunning) {
+    if (e.code === 'Escape' && window.gameStarted) {
+      e.preventDefault();
+      window.gameStarted = false;
       game.gameRunning = false;
       document.getElementById('menu').style.display = 'flex';
     }
@@ -29,4 +44,6 @@ window.addEventListener('DOMContentLoaded', () => {
     game.renderer.setSize(w, h);
   });
   requestAnimationFrame(gameLoop);
+  document.addEventListener('pointerlockchange', () => { window.LastLine.pointerLocked = document.pointerLockElement !== null; }, false);
+  document.addEventListener('mozpointerlockchange', () => { window.LastLine.pointerLocked = document.mozPointerLockElement !== null; }, false);
 });

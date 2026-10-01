@@ -9,6 +9,7 @@ window.LastLine.Game = class {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowShadowMap;
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.player = new window.LastLine.Player(this.scene);
     this.enemies = [];
     this.weapon = new window.LastLine.Weapon(this.scene);
@@ -16,6 +17,7 @@ window.LastLine.Game = class {
     this.waveCount = 0;
     this.waveSpawnDelay = 100;
     this.gameRunning = false;
+    this.pointerLocked = false;
     this.initScene();
   }
   initScene() {
@@ -50,8 +52,13 @@ window.LastLine.Game = class {
     this.player.damageDealt = 0;
     this.enemies = [];
     this.waveSpawnDelay = 0;
-    document.getElementById('menu').style.display = 'none';
-    document.addEventListener('click', () => { document.getElementById('gameCanvas').requestPointerLock(); });
+    window.LastLine.UI.hideMenu();
+    if (document.pointerLockElement === null) {
+      document.getElementById('gameCanvas').requestPointerLock = document.getElementById('gameCanvas').requestPointerLock || document.getElementById('gameCanvas').mozRequestPointerLock;
+      if (document.getElementById('gameCanvas').requestPointerLock) {
+        document.getElementById('gameCanvas').requestPointerLock();
+      }
+    }
   }
   spawnWave() {
     const M = window.LastLine.Math;
@@ -69,6 +76,7 @@ window.LastLine.Game = class {
   update(dt) {
     if (!this.gameRunning) return;
     this.gameTimer += dt;
+    this.player.timeAlive = this.gameTimer;
     const Input = window.LastLine.Input;
     this.player.update(dt, Input);
     if (this.camera) this.camera.update();
@@ -79,9 +87,9 @@ window.LastLine.Game = class {
       if (dist < 2) {
         if (this.player.takeDamage(this.enemies[i].damage * dt)) {
           this.gameRunning = false;
-          this.player.timeAlive = this.gameTimer;
           window.LastLine.UI.showGameOver(this.player);
         }
+        window.LastLine.Effects.flashScreen(0.1);
       }
     }
     if (Input.mouse.down) {
@@ -92,14 +100,14 @@ window.LastLine.Game = class {
     }
     this.weapon.update(dt, this.enemies);
     for (const bullet of this.weapon.bullets) {
-      this.player.damageDealt += 25;
+      this.player.damageDealt += 0.5;
     }
     this.waveSpawnDelay -= 1;
     if (this.waveSpawnDelay <= 0) {
       this.spawnWave();
       this.waveSpawnDelay = 200;
     }
-    window.LastLine.UI.updateHUD(this.player);
+    window.LastLine.UI.updateHUD(this.player, this.enemies, this.waveCount, this.waveSpawnDelay);
     window.LastLine.UI.updateRadar(this.player, this.enemies);
   }
   render() {

@@ -9,7 +9,7 @@ window.LastLine.Enemy = class {
     this.damage = 10 + difficulty * 5;
     this.attackRange = 1.5;
     this.sightRange = 150;
-    this.mesh = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshStandardMaterial({ color: 0xff3333 }));
+    this.mesh = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0x330000 }));
     this.mesh.position.copy(this.position);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
@@ -27,7 +27,7 @@ window.LastLine.Enemy = class {
   takeDamage(amount) {
     this.health -= amount;
     this.mesh.material.emissive.setHex(0xff0000);
-    setTimeout(() => { this.mesh.material.emissive.setHex(0x000000); }, 100);
+    setTimeout(() => { this.mesh.material.emissive.setHex(0x330000); }, 100);
     return this.health <= 0;
   }
   remove() {

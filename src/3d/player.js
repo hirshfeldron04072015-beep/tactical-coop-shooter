@@ -19,16 +19,17 @@ window.LastLine.Player = class {
     this.shootCooldown = 0;
     this.gravity = 0.98;
     this.velocity.y = 0;
+    this.timeAlive = 0;
   }
   update(dt, input) {
     const M = window.LastLine.Math;
     const dir = new THREE.Vector3();
-    if (input.isDown('KeyW')) dir.z -= 1;
-    if (input.isDown('KeyS')) dir.z += 1;
-    if (input.isDown('KeyA')) dir.x -= 1;
-    if (input.isDown('KeyD')) dir.x += 1;
+    if (input.isDown('KeyW') || input.isDown('ArrowUp')) dir.z -= 1;
+    if (input.isDown('KeyS') || input.isDown('ArrowDown')) dir.z += 1;
+    if (input.isDown('KeyA') || input.isDown('ArrowLeft')) dir.x -= 1;
+    if (input.isDown('KeyD') || input.isDown('ArrowRight')) dir.x += 1;
     if (dir.length() > 0) dir.normalize();
-    this.isSprinting = input.isDown('ShiftLeft');
+    this.isSprinting = input.isDown('ShiftLeft') || input.isDown('ShiftRight');
     const moveSpeed = this.isSprinting ? this.sprintSpeed : this.speed;
     this.velocity.x = dir.x * moveSpeed;
     this.velocity.z = dir.z * moveSpeed;

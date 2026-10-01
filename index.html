@@ -11,15 +11,18 @@
       height: 100%;
       overflow: hidden;
       background: #000;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
+      touch-action: none;
+      user-select: none;
     }
     body { display: flex; align-items: center; justify-content: center; }
     #gameContainer {
       width: 100vw;
       height: 100vh;
       position: relative;
+      touch-action: none;
     }
-    canvas { display: block; width: 100%; height: 100%; }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; }
     #hud {
       position: absolute;
       top: 0;
@@ -43,6 +46,7 @@
       border-radius: 50%;
       pointer-events: none;
       opacity: 0.8;
+      z-index: 50;
     }
     #crosshair::before {
       content: '';
@@ -55,40 +59,130 @@
       transform: translate(-50%, -50%);
       border-radius: 50%;
     }
-    #healthBar {
+    #topBar {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 200px;
-      height: 20px;
-      background: #1a1a1a;
-      border: 2px solid #0f0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(180deg, rgba(15, 200, 100, 0.15) 0%, rgba(15, 200, 100, 0.05) 100%);
+      border-bottom: 1px solid rgba(15, 200, 100, 0.3);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 40;
+    }
+    .stat-box {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(15, 200, 100, 0.4);
+      padding: 8px 15px;
+      border-radius: 4px;
+      color: #0f0;
+      font-size: 13px;
+      font-family: monospace;
+      text-shadow: 0 0 3px rgba(15, 200, 100, 0.8);
+      min-width: 120px;
+    }
+    #healthBar {
+      width: 250px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1.5px solid #0f0;
       overflow: hidden;
+      border-radius: 3px;
+      position: relative;
     }
     #healthFill {
       height: 100%;
-      background: #0f0;
+      background: linear-gradient(90deg, #0f0 0%, #0f0 70%, #0a0 100%);
       width: 100%;
       transition: width 0.1s;
+      box-shadow: 0 0 8px #0f0, inset 0 0 4px rgba(0, 255, 0, 0.3);
+    }
+    #healthText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #000;
+      font-weight: bold;
+      font-size: 12px;
+      text-shadow: 0 0 3px rgba(0, 255, 0, 0.8);
+      z-index: 5;
+      pointer-events: none;
     }
     #ammoDisplay {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 15px;
-      border: 2px solid #0f0;
-      color: #0f0;
-      font-family: monospace;
-    }
-    #radar {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      width: 150px;
-      height: 150px;
+      bottom: 30px;
+      right: 30px;
       background: rgba(0, 0, 0, 0.7);
-      border: 2px solid #0f0;
+      padding: 15px 20px;
+      border: 1.5px solid #ff9900;
+      color: #ff9900;
+      font-family: monospace;
+      font-size: 13px;
+      border-radius: 4px;
+      text-shadow: 0 0 3px rgba(255, 153, 0, 0.8);
+      min-width: 150px;
+      box-shadow: 0 0 10px rgba(255, 153, 0, 0.2);
+    }
+    #ammoDisplay > div {
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #ammoBar {
+      width: 100px;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #ff9900;
+      margin-top: 5px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #ammoBarFill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff9900, #ffcc00);
+      width: 100%;
+      box-shadow: 0 0 5px #ff9900;
+    }
+    #waveInfo {
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 20px;
+      border: 1.5px solid #00ccff;
+      color: #00ccff;
+      font-family: monospace;
+      font-size: 13px;
+      border-radius: 4px;
+      text-shadow: 0 0 3px rgba(0, 204, 255, 0.8);
+      min-width: 150px;
+      box-shadow: 0 0 10px rgba(0, 204, 255, 0.2);
+    }
+    #waveInfo > div {
+      margin: 5px 0;
+    }
+    #radarContainer {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      width: 180px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1.5px solid #0f0;
+      border-radius: 4px;
+      padding: 8px;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    }
+    #radarCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
     }
     #menu {
       position: absolute;
@@ -96,77 +190,234 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a0a15 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      z-index: 100;
+      z-index: 1000;
       color: #0f0;
       font-family: monospace;
+      padding: 20px;
     }
     #menu h1 {
-      font-size: 64px;
-      margin-bottom: 40px;
-      text-shadow: 0 0 20px #0f0;
+      font-size: clamp(36px, 8vw, 72px);
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px #0f0, 0 0 40px #0a0;
+      letter-spacing: 3px;
     }
-    #menu p {
-      font-size: 18px;
-      margin: 10px;
+    #menu .subtitle {
+      font-size: clamp(14px, 4vw, 24px);
+      color: #00ccff;
+      margin-bottom: 50px;
+      text-shadow: 0 0 10px #00ccff;
+    }
+    #gameTitle {
+      font-size: clamp(12px, 3vw, 18px);
+      color: #ff9900;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 8px #ff9900;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 300px;
+    }
+    .menu-button {
+      padding: clamp(12px, 3vw, 16px) 20px;
+      background: rgba(15, 200, 100, 0.1);
+      border: 2px solid #0f0;
+      color: #0f0;
+      font-family: monospace;
+      font-size: clamp(14px, 3vw, 18px);
       cursor: pointer;
+      border-radius: 4px;
       transition: all 0.3s;
+      text-shadow: 0 0 5px #0f0;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: bold;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
     }
-    #menu p:hover {
-      text-shadow: 0 0 10px #0f0;
-      transform: scale(1.1);
+    .menu-button:hover {
+      background: rgba(15, 200, 100, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+      transform: scale(1.05);
+    }
+    .menu-button:active {
+      transform: scale(0.98);
+      background: rgba(15, 200, 100, 0.3);
+    }
+    .controls {
+      margin-top: 40px;
+      font-size: clamp(11px, 2vw, 14px);
+      color: #666;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.6;
     }
     #gameOver {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(30, 0, 0, 0.9));
       padding: 40px;
       border: 3px solid #f00;
       text-align: center;
       display: none;
-      z-index: 200;
+      z-index: 2000;
       color: #0f0;
       font-family: monospace;
-      min-width: 400px;
+      min-width: 300px;
+      max-width: 90vw;
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(255, 0, 0, 0.5), inset 0 0 20px rgba(255, 0, 0, 0.1);
     }
-    #gameOver h2 { color: #f00; font-size: 48px; margin-bottom: 20px; }
-    #gameOver p { margin: 10px 0; font-size: 16px; }
+    #gameOver h2 {
+      color: #f00;
+      font-size: clamp(32px, 6vw, 48px);
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px #f00;
+    }
+    #gameOver p {
+      margin: 8px 0;
+      font-size: clamp(12px, 2.5vw, 16px);
+      color: #0f0;
+    }
+    #gameOver .stat-line {
+      color: #00ccff;
+      margin: 5px 0;
+    }
+    #restartButton {
+      margin-top: 25px;
+      padding: 12px 24px;
+      background: rgba(255, 0, 0, 0.1);
+      border: 2px solid #f00;
+      color: #f00;
+      font-family: monospace;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s;
+      text-shadow: 0 0 5px #f00;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: bold;
+      touch-action: manipulation;
+    }
+    #restartButton:hover {
+      background: rgba(255, 0, 0, 0.2);
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+      transform: scale(1.05);
+    }
+    #restartButton:active {
+      transform: scale(0.98);
+    }
+    .mission-info {
+      position: absolute;
+      top: 100px;
+      left: 30px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 20px;
+      border: 1.5px solid #ff00ff;
+      color: #ff00ff;
+      font-family: monospace;
+      font-size: 13px;
+      border-radius: 4px;
+      text-shadow: 0 0 3px rgba(255, 0, 255, 0.8);
+      max-width: 250px;
+      box-shadow: 0 0 10px rgba(255, 0, 255, 0.2);
+      pointer-events: none;
+      display: none;
+    }
+    @media (max-width: 768px) {
+      #topBar { height: auto; flex-wrap: wrap; gap: 10px; padding: 10px; }
+      #ammoDisplay { bottom: 20px; right: 20px; padding: 12px 15px; font-size: 12px; }
+      #waveInfo { bottom: 20px; left: 20px; padding: 12px 15px; font-size: 12px; }
+      .stat-box { min-width: 100px; padding: 6px 12px; font-size: 12px; }
+      #healthBar { width: 180px; height: 20px; }
+    }
+    @media (max-width: 480px) {
+      #topBar { padding: 8px; }
+      #ammoDisplay { bottom: 15px; right: 15px; min-width: 130px; padding: 10px 12px; font-size: 11px; }
+      #waveInfo { bottom: 15px; left: 15px; min-width: 130px; padding: 10px 12px; font-size: 11px; }
+      .stat-box { min-width: 90px; padding: 5px 10px; font-size: 11px; }
+      #healthBar { width: 150px; height: 18px; }
+    }
   </style>
 </head>
 <body>
   <div id="gameContainer">
     <canvas id="gameCanvas"></canvas>
     <div id="hud">
-      <div id="healthBar">
-        <div id="healthFill"></div>
+      <div id="topBar">
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+          <div class="stat-box">Level: <span id="levelDisplay">1</span></div>
+          <div class="stat-box">Kills: <span id="killsDisplay">0</span></div>
+          <div class="stat-box">Wave: <span id="waveDisplay">1</span></div>
+        </div>
+        <div id="healthBar">
+          <div id="healthFill" style="width: 100%;"></div>
+          <div id="healthText">100/100</div>
+        </div>
       </div>
       <div id="crosshair"></div>
-      <div id="ammoDisplay">
-        <div>Ammo: <span id="ammoCount">30</span></div>
-        <div>Mag: <span id="magCount">5</span></div>
-        <div id="weaponName" style="margin-top: 10px;">Pulse Rifle</div>
+      <div id="waveInfo">
+        <div>⬤ WAVE <span id="waveNum">1</span></div>
+        <div>◆ Enemies: <span id="enemyCount">0</span></div>
+        <div style="margin-top: 8px; font-size: 11px; opacity: 0.7;">Next Wave: <span id="nextWaveTime">20</span>s</div>
       </div>
-      <canvas id="radarCanvas" width="150" height="150" style="position: absolute; bottom: 20px; left: 20px; border: 2px solid #0f0;"></canvas>
+      <div id="ammoDisplay">
+        <div>⬥ Ammo: <span id="ammoCount">300</span></div>
+        <div>
+          <div id="ammoBar">
+            <div id="ammoBarFill" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div id="weaponName" style="margin-top: 8px; color: #ffcc00; font-size: 12px;">Pulse Rifle</div>
+      </div>
+      <div id="radarContainer">
+        <canvas id="radarCanvas" width="160" height="160" style="display: block;"></canvas>
+      </div>
+      <div class="mission-info" id="missionInfo">
+        <div id="missionTitle">Mission: Unknown</div>
+        <div id="missionProgress" style="margin-top: 8px; font-size: 12px;">Progress: 0/10</div>
+      </div>
     </div>
     <div id="menu">
       <h1>LAST LINE</h1>
-      <p style="margin-top: 30px;">3D Tactical Shooter</p>
-      <p style="margin-top: 50px; font-size: 16px;">Press SPACE to Start</p>
-      <p style="font-size: 14px; margin-top: 30px;">
-        WASD: Move | Mouse: Look | LClick: Shoot | Shift: Sprint<br>
-        F: Melee | Q: Ability | R: Reload | ESC: Menu
-      </p>
+      <div class="subtitle">3D TACTICAL SHOOTER</div>
+      <div style="width: 100%; max-width: 300px; text-align: center; margin-bottom: 30px; color: #666; font-size: 12px; border-top: 1px solid rgba(15, 200, 100, 0.3); padding-top: 20px;">
+        NEURAL DEFENSE PROTOCOL v3.2
+      </div>
+      <div class="button-group">
+        <button class="menu-button" id="playBtn" onclick="window.gameStarted = false; document.getElementById('menu').style.display = 'none';">▶ Play Game</button>
+        <button class="menu-button" id="settingsBtn" onclick="alert('Settings coming soon');" style="opacity: 0.6;">⚙ Settings</button>
+        <button class="menu-button" id="aboutBtn" onclick="alert('Last Line v1.0\nA 3D Tactical Shooter\n\nUse WASD to move, mouse to aim, click to shoot.');" style="opacity: 0.6;">ℹ About</button>
+      </div>
+      <div class="controls">
+        <strong>CONTROLS:</strong><br>
+        WASD / Arrow Keys - Move<br>
+        Mouse - Aim & Look<br>
+        Left Click - Shoot<br>
+        Shift - Sprint<br>
+        F - Melee Attack<br>
+        Q - Ability<br>
+        ESC - Menu
+      </div>
     </div>
     <div id="gameOver">
-      <h2>MISSION FAILED</h2>
-      <p id="finalStats"></p>
-      <p style="margin-top: 20px; cursor: pointer;" onclick="location.reload()">Press R to Restart</p>
+      <h2>⚠ MISSION FAILED ⚠</h2>
+      <div id="finalStats"></div>
+      <button id="restartButton" onclick="location.reload();">↻ Restart Mission</button>
     </div>
   </div>
 

@@ -17,7 +17,7 @@ window.LastLine.Effects = {
   },
   flashScreen(intensity = 0.5) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: ${intensity}; pointer-events: none;`;
+    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: ${intensity}; pointer-events: none; z-index: 999;`;
     document.body.appendChild(overlay);
     setTimeout(() => { overlay.remove(); }, 100);
   }
