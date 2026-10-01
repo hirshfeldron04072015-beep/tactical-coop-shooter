@@ -15,14 +15,28 @@
       touch-action: none;
       user-select: none;
     }
-    body { display: flex; align-items: center; justify-content: center; }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top, rgba(15, 200, 100, 0.08), transparent 35%),
+        linear-gradient(180deg, #05070a 0%, #090d13 100%);
+    }
     #gameContainer {
       width: 100vw;
       height: 100vh;
       position: relative;
       touch-action: none;
+      background: #05090d;
     }
-    canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
     #hud {
       position: absolute;
       top: 0;
@@ -47,6 +61,7 @@
       pointer-events: none;
       opacity: 0.8;
       z-index: 50;
+      box-shadow: 0 0 12px rgba(15, 200, 100, 0.6);
     }
     #crosshair::before {
       content: '';
@@ -65,8 +80,8 @@
       left: 0;
       width: 100%;
       height: 80px;
-      background: linear-gradient(180deg, rgba(15, 200, 100, 0.15) 0%, rgba(15, 200, 100, 0.05) 100%);
-      border-bottom: 1px solid rgba(15, 200, 100, 0.3);
+      background: linear-gradient(180deg, rgba(15, 200, 100, 0.12) 0%, rgba(15, 200, 100, 0.04) 100%);
+      border-bottom: 1px solid rgba(15, 200, 100, 0.35);
       padding: 12px 20px;
       display: flex;
       justify-content: space-between;
@@ -80,19 +95,20 @@
       padding: 8px 15px;
       border-radius: 4px;
       color: #0f0;
-      font-size: 13px;
+      font-size: clamp(10px, 1.5vw, 13px);
       font-family: monospace;
       text-shadow: 0 0 3px rgba(15, 200, 100, 0.8);
-      min-width: 120px;
+      min-width: 110px;
     }
     #healthBar {
-      width: 250px;
+      width: min(250px, 32vw);
       height: 24px;
       background: rgba(0, 0, 0, 0.7);
       border: 1.5px solid #0f0;
       overflow: hidden;
       border-radius: 3px;
       position: relative;
+      box-shadow: 0 0 12px rgba(15, 200, 100, 0.2);
     }
     #healthFill {
       height: 100%;
@@ -171,7 +187,7 @@
       position: absolute;
       bottom: 30px;
       right: 30px;
-      width: 180px;
+      width: min(180px, 32vw);
       background: rgba(0, 0, 0, 0.7);
       border: 1.5px solid #0f0;
       border-radius: 4px;
@@ -183,6 +199,7 @@
       width: 100%;
       height: auto;
       image-rendering: pixelated;
+      border-radius: 3px;
     }
     #menu {
       position: absolute;
@@ -199,6 +216,7 @@
       color: #0f0;
       font-family: monospace;
       padding: 20px;
+      pointer-events: auto;
     }
     #menu h1 {
       font-size: clamp(36px, 8vw, 72px);
@@ -212,20 +230,12 @@
       margin-bottom: 50px;
       text-shadow: 0 0 10px #00ccff;
     }
-    #gameTitle {
-      font-size: clamp(12px, 3vw, 18px);
-      color: #ff9900;
-      margin-top: 30px;
-      margin-bottom: 20px;
-      text-shadow: 0 0 8px #ff9900;
-    }
     .button-group {
       display: flex;
       flex-direction: column;
       gap: 12px;
       margin: 20px 0;
-      width: 100%;
-      max-width: 300px;
+      width: min(100%, 320px);
     }
     .menu-button {
       padding: clamp(12px, 3vw, 16px) 20px;
@@ -236,7 +246,7 @@
       font-size: clamp(14px, 3vw, 18px);
       cursor: pointer;
       border-radius: 4px;
-      transition: all 0.3s;
+      transition: all 0.3s ease;
       text-shadow: 0 0 5px #0f0;
       box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
       text-transform: uppercase;
@@ -245,6 +255,7 @@
       touch-action: manipulation;
       -webkit-user-select: none;
       user-select: none;
+      pointer-events: auto;
     }
     .menu-button:hover {
       background: rgba(15, 200, 100, 0.2);
@@ -258,9 +269,9 @@
     .controls {
       margin-top: 40px;
       font-size: clamp(11px, 2vw, 14px);
-      color: #666;
+      color: rgba(255,255,255,0.75);
       text-align: center;
-      max-width: 400px;
+      max-width: 420px;
       line-height: 1.6;
     }
     #gameOver {
@@ -276,14 +287,14 @@
       z-index: 2000;
       color: #0f0;
       font-family: monospace;
-      min-width: 300px;
-      max-width: 90vw;
+      min-width: min(90vw, 360px);
       border-radius: 8px;
       box-shadow: 0 0 40px rgba(255, 0, 0, 0.5), inset 0 0 20px rgba(255, 0, 0, 0.1);
+      pointer-events: auto;
     }
     #gameOver h2 {
       color: #f00;
-      font-size: clamp(32px, 6vw, 48px);
+      font-size: clamp(28px, 6vw, 48px);
       margin-bottom: 20px;
       text-shadow: 0 0 15px #f00;
     }
@@ -291,10 +302,6 @@
       margin: 8px 0;
       font-size: clamp(12px, 2.5vw, 16px);
       color: #0f0;
-    }
-    #gameOver .stat-line {
-      color: #00ccff;
-      margin: 5px 0;
     }
     #restartButton {
       margin-top: 25px;
@@ -318,9 +325,6 @@
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
       transform: scale(1.05);
     }
-    #restartButton:active {
-      transform: scale(0.98);
-    }
     .mission-info {
       position: absolute;
       top: 100px;
@@ -339,18 +343,38 @@
       display: none;
     }
     @media (max-width: 768px) {
-      #topBar { height: auto; flex-wrap: wrap; gap: 10px; padding: 10px; }
-      #ammoDisplay { bottom: 20px; right: 20px; padding: 12px 15px; font-size: 12px; }
-      #waveInfo { bottom: 20px; left: 20px; padding: 12px 15px; font-size: 12px; }
-      .stat-box { min-width: 100px; padding: 6px 12px; font-size: 12px; }
-      #healthBar { width: 180px; height: 20px; }
+      #topBar {
+        height: auto;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px;
+      }
+      #ammoDisplay {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 15px;
+        font-size: 12px;
+      }
+      #waveInfo {
+        bottom: 20px;
+        left: 20px;
+        padding: 12px 15px;
+        font-size: 12px;
+      }
+      .stat-box {
+        min-width: 90px;
+        padding: 6px 12px;
+      }
+      #healthBar {
+        width: 180px;
+        height: 20px;
+      }
     }
     @media (max-width: 480px) {
       #topBar { padding: 8px; }
-      #ammoDisplay { bottom: 15px; right: 15px; min-width: 130px; padding: 10px 12px; font-size: 11px; }
-      #waveInfo { bottom: 15px; left: 15px; min-width: 130px; padding: 10px 12px; font-size: 11px; }
-      .stat-box { min-width: 90px; padding: 5px 10px; font-size: 11px; }
-      #healthBar { width: 150px; height: 18px; }
+      #ammoDisplay { min-width: 120px; padding: 10px 12px; }
+      #waveInfo { min-width: 120px; padding: 10px 12px; }
+      .stat-box { min-width: 80px; padding: 5px 10px; }
     }
   </style>
 </head>
@@ -399,9 +423,9 @@
         NEURAL DEFENSE PROTOCOL v3.2
       </div>
       <div class="button-group">
-        <button class="menu-button" id="playBtn" onclick="window.gameStarted = false; document.getElementById('menu').style.display = 'none';">▶ Play Game</button>
-        <button class="menu-button" id="settingsBtn" onclick="alert('Settings coming soon');" style="opacity: 0.6;">⚙ Settings</button>
-        <button class="menu-button" id="aboutBtn" onclick="alert('Last Line v1.0\nA 3D Tactical Shooter\n\nUse WASD to move, mouse to aim, click to shoot.');" style="opacity: 0.6;">ℹ About</button>
+        <button class="menu-button" id="playBtn">▶ Play Game</button>
+        <button class="menu-button" id="settingsBtn" style="opacity: 0.7;">⚙ Settings</button>
+        <button class="menu-button" id="aboutBtn" style="opacity: 0.7;">ℹ About</button>
       </div>
       <div class="controls">
         <strong>CONTROLS:</strong><br>
