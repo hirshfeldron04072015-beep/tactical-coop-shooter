@@ -1,24 +1,44 @@
 window.LastLine = window.LastLine || {};
+
 window.LastLine.Effects = {
-  createExplosion(scene, position) {
-    const particle = new THREE.Mesh(new THREE.SphereGeometry(0.2, 4, 4), new THREE.MeshStandardMaterial({ color: 0xffaa00 }));
-    particle.position.copy(position);
-    particle.castShadow = true;
-    scene.add(particle);
-    let life = 0.3;
-    const update = () => {
-      life -= 0.016;
-      particle.scale.multiplyScalar(0.98);
-      particle.material.opacity = life / 0.3;
-      if (life > 0) requestAnimationFrame(update);
-      else scene.remove(particle);
+  muzzleFlashes: [],
+  bloodSplats: [],
+
+  createMuzzleFlash(position, camera) {
+    const flash = {
+      position: position.clone(),
+      intensity: 1.0,
+      life: 0.1,
     };
-    update();
+    this.muzzleFlashes.push(flash);
   },
-  flashScreen(intensity = 0.5) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: ${intensity}; pointer-events: none; z-index: 999;`;
-    document.body.appendChild(overlay);
-    setTimeout(() => { overlay.remove(); }, 100);
-  }
+
+  createBloodSplat(position, scene) {
+    const geom = new THREE.SphereGeometry(0.15, 4, 4);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x880000,
+      emissive: 0x440000,
+    });
+    const mesh = new THREE.Mesh(geom, mat);
+    mesh.position.copy(position);
+    scene.add(mesh);
+
+    this.bloodSplats.push({
+      mesh,
+      life: 3.0,
+    });
+  },
+
+  update(dt) {
+    this.muzzleFlashes = this.muzzleFlashes.filter(flash => {
+      flash.life -= dt;
+      return flash.life > 0;
+    });
+
+    this.bloodSplats = this.bloodSplats.filter(splat => {
+      splat.life -= dt;
+      splat.mesh.material.opacity = splat.life / 3.0;
+      return splat.life > 0;
+    });
+  },
 };

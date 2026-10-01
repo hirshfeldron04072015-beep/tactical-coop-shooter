@@ -16,23 +16,25 @@ window.addEventListener('DOMContentLoaded', () => {
   if (playBtn) {
     playBtn.addEventListener('click', (event) => {
       event.preventDefault();
+      event.stopPropagation();
       startGame();
     });
     playBtn.addEventListener('touchstart', (event) => {
       event.preventDefault();
+      event.stopPropagation();
       startGame();
     }, { passive: false });
   }
 
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
-      alert('Settings coming soon.\nCurrent build supports responsive desktop and mobile play.');
+      alert('Settings coming soon.');
     });
   }
 
   if (aboutBtn) {
     aboutBtn.addEventListener('click', () => {
-      alert('Last Line v3.2\nA 3D tactical shooter prototype.\n\nWASD move • mouse aim • click to shoot');
+      alert('Last Line v3.2 - Tactical Shooter');
     });
   }
 
@@ -41,13 +43,11 @@ window.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       startGame();
     }
-    if (e.code === 'Escape') {
+    if (e.code === 'Escape' && game.gameRunning) {
       e.preventDefault();
-      if (game.gameRunning) {
-        window.gameStarted = false;
-        game.gameRunning = false;
-        if (menu) menu.style.display = 'flex';
-      }
+      window.gameStarted = false;
+      game.gameRunning = false;
+      if (menu) menu.style.display = 'flex';
     }
   });
 
@@ -70,13 +70,22 @@ window.addEventListener('DOMContentLoaded', () => {
     game.renderer.setSize(w, h);
   });
 
-  requestAnimationFrame(gameLoop);
+  // Mouse click detection for shooting
+  document.addEventListener('click', () => {
+    if (!window.gameStarted || !game.gameRunning) return;
+    window.LastLine.Input.keys[0] = true;
+    setTimeout(() => {
+      window.LastLine.Input.keys[0] = false;
+    }, 50);
+  });
 
   document.addEventListener('pointerlockchange', () => {
-    window.LastLine.pointerLocked = document.pointerLockElement !== null;
+    window.LastLine.Input.pointerLocked = document.pointerLockElement !== null;
   }, false);
 
   document.addEventListener('mozpointerlockchange', () => {
-    window.LastLine.pointerLocked = document.mozPointerLockElement !== null;
+    window.LastLine.Input.pointerLocked = document.mozPointerLockElement !== null;
   }, false);
+
+  requestAnimationFrame(gameLoop);
 });

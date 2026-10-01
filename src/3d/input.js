@@ -1,20 +1,41 @@
 window.LastLine = window.LastLine || {};
+
 window.LastLine.Input = {
   keys: {},
-  mouse: { x: 0, y: 0, down: false, deltaX: 0, deltaY: 0 },
-  isDown(code) { return !!this.keys[code]; },
+  mouse: { x: 0, y: 0, delta: { x: 0, y: 0 } },
+  pointerLocked: false,
+
   init() {
-    document.addEventListener('keydown', (e) => { this.keys[e.code] = true; if (e.code === 'Escape') e.preventDefault(); });
-    document.addEventListener('keyup', (e) => { this.keys[e.code] = false; });
-    document.addEventListener('mousemove', (e) => {
-      this.mouse.deltaX = e.movementX || 0;
-      this.mouse.deltaY = e.movementY || 0;
-      this.mouse.x = e.clientX;
-      this.mouse.y = e.clientY;
+    document.addEventListener('keydown', (e) => {
+      window.LastLine.Input.keys[e.code] = true;
     });
-    document.addEventListener('mousedown', () => { this.mouse.down = true; });
-    document.addEventListener('mouseup', () => { this.mouse.down = false; });
-    document.addEventListener('touchstart', (e) => { this.mouse.down = true; });
-    document.addEventListener('touchend', (e) => { this.mouse.down = false; });
-  }
+    document.addEventListener('keyup', (e) => {
+      window.LastLine.Input.keys[e.code] = false;
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (window.LastLine.Input.pointerLocked) {
+        window.LastLine.Input.mouse.delta.x = e.movementX;
+        window.LastLine.Input.mouse.delta.y = e.movementY;
+      }
+      window.LastLine.Input.mouse.x = e.clientX;
+      window.LastLine.Input.mouse.y = e.clientY;
+    });
+    document.addEventListener('click', () => {
+      if (!window.LastLine.Input.pointerLocked) {
+        document.body.requestPointerLock();
+      }
+    });
+  },
+
+  isPressed: (code) => window.LastLine.Input.keys[code] || false,
+
+  getMovementInput: () => ({
+    forward: window.LastLine.Input.isPressed('KeyW') || window.LastLine.Input.isPressed('ArrowUp'),
+    backward: window.LastLine.Input.isPressed('KeyS') || window.LastLine.Input.isPressed('ArrowDown'),
+    left: window.LastLine.Input.isPressed('KeyA') || window.LastLine.Input.isPressed('ArrowLeft'),
+    right: window.LastLine.Input.isPressed('KeyD') || window.LastLine.Input.isPressed('ArrowRight'),
+    sprint: window.LastLine.Input.isPressed('ShiftLeft') || window.LastLine.Input.isPressed('ShiftRight'),
+    jump: window.LastLine.Input.isPressed('Space'),
+    melee: window.LastLine.Input.isPressed('KeyF'),
+  }),
 };
